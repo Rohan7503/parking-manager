@@ -13,7 +13,6 @@ public class ParkingLotImpl implements ParkingLot {
   private final int parkingLotId;
   private final Map<VehicleType, Queue<ParkingFloor>> floorsByType;
   private final Map<Integer, ParkingFloor> floorsById;
-  private final Map<String, ParkingTicket> ticketsByVehicleReg;
 
   /**
    * Create an empty parking lot.
@@ -37,19 +36,58 @@ public class ParkingLotImpl implements ParkingLot {
     this.parkingLotId = parkingLotId;
     this.floorsByType = new HashMap<>();
     this.floorsById = new HashMap<>();
-    this.ticketsByVehicleReg = new HashMap<>();
 
     createFloorsByType(numFloors, numSlotsByType);
   }
 
   @Override
   public ParkingTicket park(Vehicle vehicle) throws IllegalArgumentException {
-    return null;
+    if (vehicle == null) {
+      throw new IllegalArgumentException("Vehicle cannot be null");
+    }
+    if (!floorsByType.containsKey(vehicle.getType())) {
+      throw new IllegalArgumentException("This parking lot does not support the given vehicle type");
+    }
+    ParkingFloor floor = floorsByType.get(vehicle.getType()).peek();
+    if (floor == null) {
+      throw new IllegalArgumentException("This parking lot does not support the given vehicle type");
+    }
+
+    ParkingTicket parkingTicket = floor.park(vehicle); // throws IllegalArgumentException
+    if (parkingTicket == null) {
+      throw new IllegalArgumentException("Cannot park vehicle");
+    }
+
+    floorsByType.get(vehicle.getType()).remove();
+    floorsByType.get(vehicle.getType()).add(floor);
+
+    return new ParkingTicket(
+        parkingTicket.getRegNo(),
+        parkingTicket.getSlotId(),
+        parkingTicket.getFloorNo(),
+        parkingLotId
+    );
   }
 
   @Override
   public void unpark(ParkingTicket parkingTicket) throws IllegalArgumentException {
-
+    if (parkingTicket == null) {
+      throw new IllegalArgumentException("ParkingTicket cannot be null");
+    }
+    if (parkingTicket.getParkingLotId() != parkingLotId) {
+      throw new IllegalArgumentException("Invalid parking ticket. Belongs to a different parking lot");
+    }
+    if (!floorsById.containsKey(parkingTicket.getFloorNo())) {
+      throw new IllegalArgumentException("Invalid parking ticket. Floor does not exist");
+    }
+    ParkingFloor floor = floorsById.get(parkingTicket.getFloorNo());
+    Vehicle parkedVehicle = floor.getParkedVehicleByRegNo(parkingTicket.getRegNo());
+    boolean result = floor.unpark(parkingTicket);
+    if (!result) {
+      throw new IllegalArgumentException("Cannot unpark this vehicle");
+    }
+    floorsByType.get(parkedVehicle.getType()).remove(floor);
+    floorsByType.get(parkedVehicle.getType()).add(floor);
   }
 
   /**

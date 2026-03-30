@@ -24,7 +24,15 @@ interface ParkingSlot {
 
   /**
    * Return the type of vehicle that the slot can accommodate
+   *
    * @return The vehicle type that the slot can accommodate
    */
   public VehicleType getSlotType();
+
+  /**
+   * Return the ID of this slot.
+   *
+   * @return The slotId
+   */
+  public int getSlotId();
 }

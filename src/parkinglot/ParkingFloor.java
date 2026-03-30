@@ -9,7 +9,7 @@ interface ParkingFloor {
    *
    * @param vehicle The vehicle to be parked
    * @return A parking ticket upon successful parking; null otherwise
-   * @throws IllegalArgumentException If the vehicle is null
+   * @throws IllegalArgumentException If the vehicle is null or is already parked in this floor
    */
   public ParkingTicket park(Vehicle vehicle) throws IllegalArgumentException;
 
@@ -30,4 +30,13 @@ interface ParkingFloor {
    * @throws IllegalArgumentException If the slot type is null
    */
   public int getFreeSlotCount(VehicleType slotType) throws IllegalArgumentException;
+
+  /**
+   * Retrieve the vehicle parked in this floor based on its registration number.
+   *
+   * @param regNo The registration number of the vehicle
+   * @return The vehicle
+   * @throws IllegalArgumentException If the vehicle is not parked in this floor, or regNo is null
+   */
+  public Vehicle getParkedVehicleByRegNo(String regNo) throws IllegalArgumentException;
 }

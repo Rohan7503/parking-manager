@@ -28,16 +28,41 @@ class ParkingSlotImpl implements ParkingSlot {
 
   @Override
   public boolean park(Vehicle vehicle) throws IllegalArgumentException {
-    return false;
+    if (vehicle == null) {
+      throw new IllegalArgumentException("vehicle cannot be null");
+    }
+    if (parkedVehicle != null) {
+      return false;
+    }
+    if (slotType != vehicle.getType()) {
+      return false;
+    }
+    parkedVehicle = vehicle;
+    return true;
   }
 
   @Override
   public boolean unpark(Vehicle vehicle) throws IllegalArgumentException {
-    return false;
+    if (vehicle == null) {
+      throw new IllegalArgumentException("vehicle cannot be null");
+    }
+    if (parkedVehicle == null) {
+      return false;
+    }
+    if (slotType != vehicle.getType()) {
+      return false;
+    }
+    parkedVehicle = null;
+    return true;
   }
 
   @Override
   public VehicleType getSlotType() {
     return slotType;
+  }
+
+  @Override
+  public int getSlotId() {
+    return slotId;
   }
 }
